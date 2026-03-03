@@ -45,7 +45,6 @@ const getCheckoutPage = async (req, res, next) => {
       const deliveryCharge = grandTotal < 10000 ? 200 : 0;
       const totalWithDelivery = grandTotal + deliveryCharge;
 
-      // Fetch wallet balance
       const wallet = await Wallet.findOne({ user: userId });
       const walletBalance = wallet ?Math.round( wallet.balance) : 0
 

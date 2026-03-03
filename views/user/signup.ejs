@@ -442,12 +442,17 @@
         });
 
         document.getElementById("signform").addEventListener("submit", function(event) {
-    var response = grecaptcha.getResponse();
-    if (response.length == 0) {
-        event.preventDefault(); // Prevent form submission
-        document.getElementById("captcha-error").innerText = "Please complete the CAPTCHA";
-    }
-});
+            if (typeof grecaptcha !== 'undefined' && grecaptcha.getResponse) {
+                var response = grecaptcha.getResponse();
+                if (response.length == 0) {
+                    event.preventDefault();
+                    document.getElementById("captcha-error").innerText = "Please complete the CAPTCHA";
+                }
+            } else {
+                event.preventDefault();
+                document.getElementById("captcha-error").innerText = "CAPTCHA is not ready — please wait a moment and try again.";
+            }
+        });
     </script>
 
 
