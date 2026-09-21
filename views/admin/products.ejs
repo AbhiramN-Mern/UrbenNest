@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Products</title>
+    
+    
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.css">
+    
+    
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f6fa;
+            --text-dark: #2d3436;
+            --text-light: #636e72;
+    
+        }
+
+        body {
+            background-color: var(--secondary-color);
+            color: var(--text-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            
+        }
+
+        .dashboard-container {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .content-header {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .content-title {
+            color: var(--primary-color);
+            font-weight: 600;
+            margin: 0;
+        }
+
+        .search-container {
+            background-color: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .search-input .form-control {
+            border: 1px solid #e1e1e1;
+            padding: 0.7rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        .search-input .btn {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 0.7rem 1.5rem;
+        }
+
+        .products-table {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 1.5rem;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background-color: var(--secondary-color);
+            color: var(--text-dark);
+            font-weight: 600;
+            border-bottom: none;
+            padding: 1rem;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            vertical-align: middle;
+            color: var(--text-light);
+        }
+
+        .btn-custom {
+            border-radius: 5px;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 500;
+            min-width: 100px;
+        }
+
+        .btn-offer {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-block {
+            background-color: #e74c3c;
+            color: white;
+        }
+
+        .btn-unblock {
+            background-color: #27ae60;
+            color: white;
+        }
+
+        .btn-edit {
+            background-color: #f1c40f;
+            color: white;
+        }
+
+        .pagination {
+            margin-top: 2rem;
+        }
+
+        .page-link {
+            color: var(--primary-color);
+            padding: 0.5rem 1rem;
+        }
+
+        .page-item.active .page-link {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .loading-spinner {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .btn-btn-custom-btn-delete{
+        color: #dc3545; /* Bootstrap's danger red */
+        border: 1px solid #dc3545;
+        background-color: transparent;
+        padding: 0.375rem 0.75rem;
+        font-size: 1rem;
+        border-radius: 0.375rem;
+        transition: 0.2s ease-in-out;
+        cursor: pointer;
+        }
+
+        .btn-btn-custom-btn-delete:hover {
+        background-color: #dc3545;
+        color: white;
+        }
+
+        .notification-wrapper {
+            margin-left: auto;
+        }
+
+        .low-stock-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .low-stock-list table {
+            margin-bottom: 0;
+        }
+
+        .low-stock-list .text-danger {
+            font-weight: bold;
+            color: #dc3545 !important;
+        }
+
+        .low-stock-list .text-warning {
+            font-weight: bold;
+            color: #ffc107 !important;
+        }
+
+        .badge {
+            font-size: 0.75rem;
+            padding: 0.25em 0.6em;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 1rem;
+            }
+            
+            .table-responsive {
+                border: none;
+            }
+            
+            .btn-custom {
+                min-width: 80px;
+                padding: 0.4rem 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <%- include("../../views/partials/admin/header") %>
+
+    <div class="dashboard-container">
+        <!-- Content Header -->
+        <div class="content-header d-flex justify-content-between align-items-center">
+            <h2 class="content-title">Products Management</h2>
+            <div class="notification-wrapper">
+                <button class="btn btn-warning position-relative" onclick="showLowStockProducts()">
+                    <i class="fas fa-bell"></i> Stock Alert
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="lowStockCount">
+                        0
+                    </span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Search Section -->
+        <div class="search-container">
+            <form action="" method="get">
+                <div class="search-input">
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            class="form-control" 
+                            placeholder="Search products or brands" 
+                            name="search"
+                            aria-label="Search products"
+                        >
+                        <button class="btn btn-custom btn-offer" type="submit">
+                            Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <!-- Products Table -->
+        <div class="products-table">
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Product Name</th>
+                            <th>Brand</th>
+                            <th>Category</th>
+                            <th>regularPrice</th>
+                            <th>Sale Price</th>
+                            <th>Offer Price</th>
+                            <th>Offer</th>
+                            <th>Quantity</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                            <th>Action</th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% for(let i = 0; i < data.length; i++) { 
+                            const product = data[i];
+                        %>
+                            <tr>
+                                <td><%= product.productName %></td>
+                                <td><%= product.brand %></td>
+                                <td><%= (product.category && product.category.name) ? product.category.name : 'N/A' %></td>
+                                <td><%= product.regularPrice %></td>
+                                <td><%= product.salePrice %></td>
+                                <td><%= locals.data[i].productOffer ? product.productOffer : '0%' %></td>
+                                <td>
+                                    <% if (!product.productOffer || product.productOffer === 0) { %>
+                                        <button 
+                                            class="btn btn-custom btn-offer"
+                                            onclick="handleOffer.add('<%= product._id %>')"
+                                        >
+                                            Add Offer
+                                        </button>
+                                    <% } else { %>
+                                        <button 
+                                            class="btn btn-custom btn-block"
+                                            onclick="handleOffer.remove('<%= product._id %>')"
+                                        >
+                                            Remove
+                                        </button>
+                                    <% } %>
+                                </td>
+                                <td><%= product.quantity %></td>
+                                <td>
+                                    <button 
+                                        class="btn btn-custom <%= product.isBlocked ? 'btn-unblock' : 'btn-block' %>"
+                                        onclick="handleProductStatus('<%= product._id %>', '<%= product.isBlocked %>')"
+                                    >
+                                        <%= product.isBlocked ? 'Unblock' : 'Block' %>
+                                    </button>
+                                </td>
+                                <td>
+                                    <button 
+                                        class="btn btn-custom btn-edit"
+                                        onclick="location.href='/admin/editProduct?id=<%= product._id %>'"
+                                    >
+                                        Edit
+                                    </button>
+
+                                </td>
+                                <td>
+                                    <button class="btn-btn-custom-btn-delete" onclick="deleteProduct('<%= product._id %>')">Delete</button>
+
+
+                                </td>
+                            </tr>
+                        <% } %>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Pagination -->
+        <nav aria-label="Product navigation">
+            <ul class="pagination justify-content-center">
+                <% for (let i = 1; i <= totalPages; i++) { %>
+                    <li class="page-item <%= (i === currentPage) ? 'active' : '' %>">
+                        <a class="page-link" href="?page=<%= i %>"><%= i %></a>
+                    </li>
+                <% } %>
+            </ul>
+        </nav>
+
+        <!-- Loading Spinner -->
+        <div class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.7.1/dist/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@10/dist/sweetalert2.min.js"></script>
+
+    <script>
+        const handleOffer = {
+            add: async function(productId) {
+                try {
+                    const { value: amount } = await Swal.fire({
+                        title: 'Add Product Offer',
+                        text: 'Enter offer percentage (0-100)',
+                        input: 'number',
+                        inputAttributes: {
+                            min: 0,
+                            max: 100,
+                            step: 1
+                        },
+                        showCancelButton: true,
+                        confirmButtonColor: '#4a90e2',
+                        cancelButtonColor: '#e74c3c',
+                        inputValidator: (value) => {
+                            if (!value || value < 0 || value > 100) {
+                                return 'Please enter a valid percentage between 0 and 100';
+                            }
+                        }
+                    });
+
+                    if (amount) {
+                        document.querySelector('.loading-spinner').style.display = 'block';
+                        
+                        const response = await $.ajax({
+                            url: "/admin/addProductOffer",
+                            method: "POST",
+                            data: { 
+                                percentage: amount, 
+                                productId 
+                            }
+                        });
+
+                        if (response.status) {
+                            await Swal.fire({
+                                icon: 'success',
+                                title: 'Success!',
+                                text: 'Offer added successfully',
+                                timer: 1500
+                            });
+                            location.reload();
+                        } else {
+                            throw new Error('Failed to add offer');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Failed to add offer. Please try again.'
+                    });
+                } finally {
+                    document.querySelector('.loading-spinner').style.display = 'none';
+                }
+            },
+
+            remove: async function(productId) {
+                try {
+                    const result = await Swal.fire({
+                        title: 'Remove Offer',
+                        text: 'Are you sure you want to remove this offer?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#4a90e2',
+                        cancelButtonColor: '#e74c3c',
+                        confirmButtonText: 'Yes, remove it!'
+                    });
+
+                    if (result.isConfirmed) {
+                        document.querySelector('.loading-spinner').style.display = 'block';
+                        
+                        const response = await $.ajax({
+                            url: "/admin/removeProductOffer",
+                            method: "POST",
+                            data: { productId }
+                        });
+
+                        if (response.status) {
+                            await Swal.fire({
+                                icon: 'success',
+                                title: 'Removed!',
+                                text: 'The offer has been removed',
+                                timer: 1500
+                            });
+                            location.reload();
+                        } else {
+                            throw new Error('Failed to remove offer');
+                        }
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Oops...',
+                        text: 'Failed to remove offer. Please try again.'
+                    });
+                } finally {
+                    document.querySelector('.loading-spinner').style.display = 'none';
+                }
+            }
+        };
+
+        async function handleProductStatus(productId, isBlocked) {
+            const isCurrentlyBlocked = isBlocked === true || isBlocked === 'true';
+            const action = isCurrentlyBlocked ? 'unblock' : 'block';
+            try {
+                const result = await Swal.fire({
+                    title: `${action.charAt(0).toUpperCase() + action.slice(1)} Product`,
+                    text: `Are you sure you want to ${action} this product?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#4a90e2',
+                    cancelButtonColor: '#e74c3c',
+                    confirmButtonText: `Yes, ${action} it!`
+                });
+
+                if (result.isConfirmed) {
+                    document.querySelector('.loading-spinner').style.display = 'block';
+                    location.href = `/admin/${action}Product?id=${productId}`;
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Oops...',
+                    text: `Failed to ${action} product. Please try again.`
+                });
+            }
+        }
+
+        function deleteProduct(productId) {
+        Swal.fire({
+        title: "Are you sure?",
+        text: "Do you want to Delete this Product?",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#3085d6",
+        confirmButtonText: "Yes, Delete it!"
+        }).then((result) => {
+        if (result.isConfirmed) {
+            $.ajax({
+            url: `/admin/product/${productId}/delete`,
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            success: function (response) {
+                if (response.status) {
+                Swal.fire("Success", "Product Deleted successfully", "success").then(() => {
+                    window.location.reload();
+                });
+                } else {
+                Swal.fire("Error", "Failed to unlist product", "error");
+                }
+            },
+            error: function () {
+                Swal.fire("Error", "An error occurred while unlisting the product", "error");
+            }
+            });
+        }
+        });
+    }
+
+    async function showLowStockProducts() {
+    try {
+        const lowStockProducts = Array.from(document.querySelectorAll('table tbody tr')).filter(row => {
+            const quantity = parseInt(row.querySelector('td:nth-child(8)').textContent);
+            return quantity < 10;
+        });
+
+        if (lowStockProducts.length === 0) {
+            Swal.fire({
+                title: 'Stock Status',
+                text: 'All products are well stocked!',
+                icon: 'info'
+            });
+            return;
+        }
+
+        let html = `
+            <div class="low-stock-list">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>Current Stock</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        `;
+
+        lowStockProducts.forEach(row => {
+            const productName = row.querySelector('td:nth-child(1)').textContent;
+            const quantity = row.querySelector('td:nth-child(8)').textContent;
+            html += `
+                <tr>
+                    <td>${productName}</td>
+                    <td class="${parseInt(quantity) <= 5 ? 'text-danger' : 'text-warning'}">${quantity}</td>
+                </tr>
+            `;
+        });
+
+        html += `
+                    </tbody>
+                </table>
+            </div>
+        `;
+
+        Swal.fire({
+            title: 'Low Stock Alert',
+            html: html,
+            icon: 'warning',
+            width: '600px'
+        });
+    } catch (error) {
+        console.error('Error showing low stock products:', error);
+        Swal.fire({
+            title: 'Error',
+            text: 'Failed to load low stock products',
+            icon: 'error'
+        });
+    }
+}
+
+function updateLowStockCount() {
+    const lowStockCount = Array.from(document.querySelectorAll('table tbody tr')).filter(row => {
+        const quantity = parseInt(row.querySelector('td:nth-child(8)').textContent);
+        return quantity < 10;
+    }).length;
+
+    const badge = document.getElementById('lowStockCount');
+    badge.textContent = lowStockCount;
+    badge.style.display = lowStockCount > 0 ? 'block' : 'none';
+}
+
+document.addEventListener('DOMContentLoaded', updateLowStockCount);
+
+    </script>
+
+    <%- include("../../views/partials/admin/footer") %>
+</body>
+</html>

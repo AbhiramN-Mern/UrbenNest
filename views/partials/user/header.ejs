@@ -1,0 +1,422 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="author" content="Untree.co">
+  <link rel="shortcut icon" href="favicon.png">
+
+  <meta name="description" content="" />
+  <meta name="keywords" content="bootstrap, bootstrap4" />
+
+  <!-- Bootstrap CSS -->
+  <link href="/furni-1.0.0/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <link href="/furni-1.0.0/css/tiny-slider.css" rel="stylesheet">
+  <link href="/furni-1.0.0/css/style.css" rel="stylesheet">
+  <link rel="stylesheet" href="/css/maind134.css">
+  <link rel="icon" href="/images/logo.jpg.jpg" type="image/png">
+  <title>UrbenNest</title>
+
+  <style>
+    /* Base styles */
+    .dropdown {
+      display: inline-block;
+      position: relative;
+    }
+  
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: white;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+      z-index: 1000;
+      right: 0;
+    }
+  
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+      width: 100%;
+    }
+    
+    @media (max-width: 991px) {
+      .dropdown-content a {
+        color: rgba(255, 255, 255, 0.85);
+      }
+      
+      .dropdown-content a:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        color: white;
+      }
+    }
+  
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+  
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+  
+    .header {
+      position: relative;
+      z-index: 1500;
+    }
+  
+    .dropdown {
+      margin-top: 0.5rem;
+    }
+  
+    .custom-navbar {
+      position: relative;
+      z-index: 1500;
+    }
+  
+    .sign-in-link {
+      color: white;
+      font-weight: bold;
+      text-decoration: none;
+    }
+  
+    .navbar-brand {
+      color: white;
+    }
+  
+    .btn.btn-secondary {
+      color: #2f2f2f;
+      background: #f9bf29;
+      border-color: #f9bf29;
+      border-radius: 20px;
+    }
+  
+    .btn.btn-white-outline {
+      background: transparent;
+      border-width: 2px;
+      border-color: rgba(255, 255, 255, 0.3);
+      border-radius: 20px;
+    }
+    
+    .custom-navbar-cta .badge {
+      font-size: 0.6rem; 
+      padding: 0.3em; 
+      width: 1.4rem; 
+      height: 1.4rem; 
+      line-height: 1rem;
+      text-align: center;
+      background-color: #dc3545 !important; 
+      color: white !important; 
+      border-radius: 50%; 
+      font-weight: 600;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      transition: transform 0.2s ease-in-out;
+    }
+  
+    .custom-navbar-cta .badge:hover {
+      transform: scale(1.1); 
+      background-color: #dc3545 !important; 
+    }
+  
+    .position-relative {
+      position: relative;
+    }
+
+    /* Mobile Menu Styles */
+    .navbar-toggler {
+      border: none;
+      background: rgba(0, 0, 0, 0.2);
+      cursor: pointer;
+      padding: 10px;
+      display: none;
+      border-radius: 4px;
+    }
+
+    .navbar-toggler:focus {
+      outline: none;
+      box-shadow: none;
+    }
+
+    .mobile-menu-icon {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      width: 25px;
+      height: 20px;
+    }
+
+    .mobile-menu-icon span {
+      width: 100%;
+      height: 3px;
+      background-color: white;
+      border-radius: 3px;
+      transition: all 0.3s ease;
+    }
+
+    /* Responsive Media Queries */
+    @media (max-width: 991px) {
+      .navbar-toggler {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .navbar-collapse {
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        background-color: #222222;
+        padding: 20px;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.5);
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out;
+        width: 100%;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        z-index: 2000;
+      }
+
+      .navbar-collapse.show {
+        max-height: 500px;
+      }
+
+      .custom-navbar-nav {
+        flex-direction: column;
+        width: 100%;
+      }
+
+      .custom-navbar-nav .nav-item {
+        width: 100%;
+        margin: 8px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 8px;
+      }
+      
+      .custom-navbar-nav .nav-item:last-child {
+        border-bottom: none;
+      }
+      
+      .custom-navbar-nav .nav-link,
+      .sign-in-link {
+        color: white !important;
+        font-weight: 500;
+        padding: 10px 5px;
+      }
+      
+      .custom-navbar-nav .nav-link:hover,
+      .sign-in-link:hover {
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        color: white !important;
+      }
+
+      .custom-navbar-cta {
+        margin-left: 0 !important;
+        margin-top: 15px;
+        display: flex;
+        justify-content: flex-start;
+      }
+
+      .dropdown {
+        width: 100%;
+      }
+
+      .dropdown-content {
+        position: static;
+        box-shadow: none;
+        margin-top: 10px;
+        width: 100%;
+        background-color: #333333;
+        border-radius: 4px;
+      }
+
+      .dropdown:hover .dropdown-content {
+        display: none;
+      }
+
+      .dropdown.active .dropdown-content {
+        display: block;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Start Header/Navigation -->
+  <nav class="custom-navbar navbar navbar-expand-lg" aria-label="Furni navigation bar">
+    <div class="container">
+      <a class="navbar-brand" href="/">UrbenNest<span>.</span></a>
+      
+      <button class="navbar-toggler" type="button" id="mobile-menu-toggle">
+        <div class="mobile-menu-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+      
+      <div class="collapse navbar-collapse" id="navbarsFurni">
+        <ul class="custom-navbar-nav navbar-nav ms-auto mb-2 mb-md-0">
+          <li class="nav-item <%= currentPage === 'home' ? 'active' : '' %>">
+            <a class="nav-link" href="/">Home</a>
+          </li>
+          <li class="nav-item <%= currentPage === 'shop' ? 'active' : '' %>">
+            <a class="nav-link" href="/shop">Shop</a>
+          </li>
+          <li class="nav-item <%= currentPage === 'about' ? 'active' : '' %>">
+            <a class="nav-link" href="/about">About us</a>
+          </li>
+          <li class="nav-item <%= currentPage === 'contact' ? 'active' : '' %>">
+            <a class="nav-link" href="/contact">Contact us</a>
+          </li>
+          <% if (locals.user) { %>
+            <div class="dropdown" id="user-dropdown">
+              <a href="#" class="sign-in-link">
+                <i class="fas fa-user me-1"></i><%= (locals.user && locals.user.name) ? locals.user.name : 'Account' %>
+              </a>
+              <div class="dropdown-content">
+                <a href="/userProfile">Profile</a>
+                <a href="/logout">Logout</a>
+              </div>
+            </div>
+          <% } else { %>
+            <li class="nav-item <%= currentPage === 'signup' ? 'active' : '' %>">
+              <a class="nav-link" href="/signup">Sign</a>
+            </li>
+            <li class="nav-item <%= currentPage === 'login' ? 'active' : '' %>">
+              <a class="nav-link" href="/login">Log in</a>
+            </li>
+          <% } %>
+        </ul>
+        <ul class="custom-navbar-cta navbar-nav mb-2 mb-md-0 ms-5">
+          <li class="position-relative">
+            <a class="nav-link" style="width: 2.6rem; filter: invert(100%) sepia(100%) saturate(0%) hue-rotate(288deg) brightness(100%) contrast(100%);" href="/wishlist">
+              <img src="/furni-1.0.0/images/wishlist-1-removebg-preview.png">
+              <span class="badge position-absolute top-0 start-100 translate-middle" id="wishlistCount" style="display: none;">0</span>
+            </a>
+          </li>
+          <li class="position-relative">
+            <a class="nav-link" href="/cart">
+              <img src="/furni-1.0.0/images/cart.svg">
+              <span class="badge position-absolute top-0 start-100 translate-middle" id="cartCount" style="display: none;">0</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <script>
+    // Mobile menu toggle functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+      const navbarCollapse = document.getElementById('navbarsFurni');
+      const userDropdown = document.getElementById('user-dropdown');
+      
+      // Toggle mobile menu
+      mobileMenuToggle.addEventListener('click', function() {
+        navbarCollapse.classList.toggle('show');
+        
+        // Animate the hamburger icon
+        const spans = this.querySelectorAll('.mobile-menu-icon span');
+        if (navbarCollapse.classList.contains('show')) {
+          spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+          spans[1].style.opacity = '0';
+          spans[2].style.transform = 'rotate(-45deg) translate(7px, -7px)';
+        } else {
+          spans[0].style.transform = 'none';
+          spans[1].style.opacity = '1';
+          spans[2].style.transform = 'none';
+        }
+      });
+      
+      // Handle dropdown in mobile view
+      if (userDropdown) {
+        userDropdown.querySelector('.sign-in-link').addEventListener('click', function(e) {
+          if (window.innerWidth <= 991) {
+            e.preventDefault();
+            userDropdown.classList.toggle('active');
+          }
+        });
+      }
+      
+      // Close menu when clicking outside
+      document.addEventListener('click', function(e) {
+        if (!navbarCollapse.contains(e.target) && !mobileMenuToggle.contains(e.target) && navbarCollapse.classList.contains('show')) {
+          navbarCollapse.classList.remove('show');
+          const spans = mobileMenuToggle.querySelectorAll('.mobile-menu-icon span');
+          spans[0].style.transform = 'none';
+          spans[1].style.opacity = '1';
+          spans[2].style.transform = 'none';
+        }
+      });
+      
+      // Close menu when window is resized above breakpoint
+      window.addEventListener('resize', function() {
+        if (window.innerWidth > 991 && navbarCollapse.classList.contains('show')) {
+          navbarCollapse.classList.remove('show');
+          const spans = mobileMenuToggle.querySelectorAll('.mobile-menu-icon span');
+          spans[0].style.transform = 'none';
+          spans[1].style.opacity = '1';
+          spans[2].style.transform = 'none';
+        }
+      });
+    });
+  </script>
+
+  <script>
+    (function(){if(!window.chatbase||window.chatbase("getState")!=="initialized"){window.chatbase=(...arguments)=>{if(!window.chatbase.q){window.chatbase.q=[]}window.chatbase.q.push(arguments)};window.chatbase=new Proxy(window.chatbase,{get(target,prop){if(prop==="q"){return target.q}return(...args)=>target(prop,...args)}})}const onLoad=function(){const script=document.createElement("script");script.src="https://www.chatbase.co/embed.min.js";script.id="d8p67Y8iLW0Cgp81roWJL";script.domain="www.chatbase.co";document.body.appendChild(script)};if(document.readyState==="complete"){onLoad()}else{window.addEventListener("load",onLoad)}})();
+  </script>
+
+  <script>
+    function updateCartCount() {
+      fetch('/getCartCount')
+        .then(response => response.json())
+        .then(data => {
+          const cartCountElement = document.getElementById('cartCount');
+          if (cartCountElement) {
+            if (data.count > 0) {
+              cartCountElement.textContent = data.count;
+              cartCountElement.style.display = 'block';
+            } else {
+              cartCountElement.style.display = 'none';
+            }
+          }
+        })
+        .catch(error => console.error('Error updating cart count:', error));
+    }
+
+    function updateWishlistCount() {
+      fetch('/getWishlistCount')
+        .then(response => response.json())
+        .then(data => {
+          const wishlistCountElement = document.getElementById('wishlistCount');
+          if (wishlistCountElement) {
+            if (data.count > 0) {
+              wishlistCountElement.textContent = data.count;
+              wishlistCountElement.style.display = 'block';
+            } else {
+              wishlistCountElement.style.display = 'none';
+            }
+          }
+        })
+        .catch(error => console.error('Error updating wishlist count:', error));
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      updateCartCount();
+      updateWishlistCount();
+    });
+
+    // Update both counts every 30 seconds
+    setInterval(() => {
+      updateCartCount();
+      updateWishlistCount();
+    }, 30000);
+  </script>
+</body>
+</html>

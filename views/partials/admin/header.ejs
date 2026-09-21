@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    
+    <link rel="icon" href="/images/logo.jpg.jpg" type="image/png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        body {
+            display: flex;
+            height: 100vh;
+            background-color: #f8f9fa;
+            color: #333;
+        }
+        .sidebar {
+            width: 250px;
+            background: #ffffff;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+        }
+        .sidebar h2 {
+            color: #2c3e50;
+            text-align: center;
+            padding-bottom: 15px;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eaeaea;
+            font-weight: 600;
+        }
+        .sidebar a {
+            text-decoration: none;
+            color: #555;
+            padding: 12px 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        .sidebar a i {
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar a:hover {
+            background: #f1f1f1;
+            color: #2c3e50;
+        }
+        .sidebar a.active {
+            background: #e6f7ff;
+            color: #1890ff;
+            font-weight: 600;
+        }
+        .sidebar a[href="/admin/logout"] {
+            margin-top: auto;
+            color: #e74c3c;
+            border: 1px solid #f8d7da;
+            background: #fff5f5;
+        }
+        .sidebar a[href="/admin/logout"]:hover {
+            background: #feecec;
+        }
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px;
+            background: white;
+            border-radius: 8px;
+            color: #333;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .profile {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: url("/furni-1.0.0/Admin-side/1725771501979.jpg");
+            background-size: cover;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <h2>UrbenNest  Admin</h2>
+        <a href="/admin/dashbord" id="dashboard-link"><i class="fas fa-home"></i> Dashboard</a>
+        <a href="/admin/customers" id="customers-link"><i class="fas fa-users"></i> Customers</a>
+        <a href="/admin/category" id="category-link"><i class="fas fa-folder"></i> Category</a>
+        <a href="/admin/brands" id="brands-link"><i class="fas fa-tags"></i> Brands</a>
+        <a href="/admin/product-add" id="product-add-link"><i class="fas fa-plus-circle"></i> Add Product</a>
+        <a href="/admin/products" id="products-link"><i class="fas fa-box"></i> Products</a>
+        <a href="/admin/order-list" id="orders-link"><i class="fas fa-shopping-cart"></i> Orders</a>
+        <a href="/admin/coupon" id="coupon-link"><i class="fas fa-ticket-alt"></i> Coupon</a>
+        <a href="/admin/wallet-transactions" id="wallet-link"><i class="fas fa-wallet"></i> Wallet Management</a>
+        <a href="/admin/logout" id="logout-link"><i class="fas fa-sign-out-alt"></i> LogOut</a>
+    </div>
+
+    <script>
+        const currentPath = window.location.pathname.toLowerCase();
+        
+        document.querySelectorAll('.sidebar a').forEach(link => {
+            link.classList.remove('active');
+        });
+        
+        let activeId = null;
+        if (currentPath === '/admin/' || currentPath === '/admin' || currentPath.includes('/admin/dashbord') || currentPath.includes('/admin/dashboard')) {
+            activeId = 'dashboard-link';
+        } else if (currentPath.includes('/admin/customers')) {
+            activeId = 'customers-link';
+        } else if (currentPath.includes('/admin/category')) {
+            activeId = 'category-link';
+        } else if (currentPath.includes('/admin/brands')) {
+            activeId = 'brands-link';
+        } else if (currentPath.includes('/admin/product-add')) {
+            activeId = 'product-add-link';
+        } else if (currentPath.includes('/admin/products')) {
+            activeId = 'products-link';
+        } else if (currentPath.includes('/admin/order-list')) {
+            activeId = 'orders-link';
+        } else if (currentPath.includes('/admin/coupon')) {
+            activeId = 'coupon-link';
+        } else if (currentPath.includes('/admin/wallet-transactions')) {
+            activeId = 'wallet-link';
+        }
+
+        if (activeId) {
+            const activeElem = document.getElementById(activeId);
+            if (activeElem) activeElem.classList.add('active');
+        }
+    </script>

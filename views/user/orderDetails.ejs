@@ -1,0 +1,461 @@
+<%- include("../../views/partials/user/header", { currentPage: 'orderDetails' }) %>
+
+<main class="container">
+  <section class="content-main">
+    <div class="content-header">
+      <div class="mt-10">
+        <h2 class="content-title card-title">Order Details</h2>
+        <p>Details for Order ID: <%= orders._id %></p>
+        <p>Order Placed: <%= orderDate %></p> 
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="row mb-10 mt-10 order-info-wrap background-info">
+        <div class="col-md-4">
+          <article class="icontext align-items-start ml-130">
+            <span class="icon icon-sm rounded-circle bg-primary-light">
+              <i class="material-icons text-primary person"></i>
+            </span>
+            <div class="text">
+              <h6 class="mb-1">Customer</h6>
+              <% if (orders && orders.address && orders.address.length > 0 && orders.address[0].name && orders.address[0].phone) { %>
+                <p class="mb-1">
+                  <%= orders.address[0].name %> <br> <%= orders.address[0].phone %>
+                </p>
+              <% } else { %>
+                <p class="mb-1">Customer details not available</p>
+              <% } %>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-4">
+          <article class="icontext align-items-start ml-130">
+            <span class="icon icon-sm rounded-circle bg-primary-light">
+              <i class="text-primary material-icons md-local_shipping"></i>
+            </span>
+            <div class="text">
+              <h6 class="mb-1">Order Info</h6>
+              <p class="mb-1">
+                Payment Method: <%= orders.payment || 'N/A' %> <br>
+                Status: <%= orders.status || 'N/A' %> <br>
+                
+                <!-- Original Total Price -->
+                <!-- Original Price: ₹<%= (orders.originalTotalPrice || 0).toLocaleString() %> <br> -->
+
+                <!-- Show Discount if exists -->
+                <% if (orders.discount && orders.discount > 0) { %>
+                  Coupon Discount: -₹<%= (orders.discount).toLocaleString() %> <br>
+                <% } %>
+
+                <!-- Show Delivery Charge -->
+                <% if (orders.deliveryCharge && orders.deliveryCharge > 0) { %>
+                  Delivery Charge: +₹<%= (orders.deliveryCharge).toLocaleString() %> <br>
+                <% } else { %>
+                  Delivery Charge: <span class="text-success">Free</span> <br>
+                <% } %>
+
+                <!-- Final Amount calculation -->
+                <!-- Final Amount: ₹<%= (orders.originalTotalPrice - (orders.discount || 0) + (orders.deliveryCharge || 0)).toLocaleString() %> -->
+                Final Amount: ₹<%= (orders.originalTotalPrice || 0).toLocaleString() %> <br>
+
+              </p>
+            </div>
+          </article>
+        </div>
+        <div class="col-md-4">
+          <article class="icontext align-items-start ml-130">
+            <span class="icon icon-sm rounded-circle bg-primary-light">
+              <i class="text-primary material-icons md-place"></i>
+            </span>
+            <div class="text">
+              <h6 class="mb-1">Deliver To</h6>
+              <% if (orders && orders.address && orders.address.length > 0) { %>
+                <p class="mb-1">
+                  <strong>Name:</strong> <%= orders.address[0].name || 'N/A' %><br>
+                  <strong>Phone:</strong> <%= orders.address[0].phone || 'N/A' %><br>
+                  <strong>Address:</strong> <%= orders.address[0].landMark || 'N/A' %>, 
+                  <%= orders.address[0].city || 'N/A' %>, 
+                  <%= orders.address[0].state || 'N/A' %><br>
+                  <!-- <strong>Type:</strong> <%= orders.address[0].addressType || 'N/A' %><br>
+                  <strong>Pincode:</strong> <%= orders.address[0].pinCode || 'N/A' %> -->
+                </p>
+                
+                <% if (orders.status === "Delivered") { %>
+                  <a href="/downloadInvoice/<%= orders._id %>" class="btn btn-sm">Download Invoice</a>
+                <% } %>
+              <% } else { %>
+                <p class="mb-1">Delivery address not available</p>
+              <% } %>
+            </div>
+          </article>
+        </div>
+      </div>
+      <% if (orders.status === "Pending" && orders.payment === "razorpay") { %>
+        <div class="row mb-4">
+          <div class="col-md-12 text-center">
+            <button class="btn btn-primary btn-sm" onclick="retryPayment('<%= orders._id %>', '<%= finalAmount %>')">Retry Payment</button>
+          </div>
+        </div>
+      <% } %>
+      <div class="row">
+        <div class="col-lg">
+          <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr class="text-center">
+                  <th width="30%">Product</th>
+                  <th width="20%">Name</th>
+                  <th width="10%">Unit Price</th>
+                  <th width="10%">Quantity</th>
+                  <th class="text-center" width="10%">Total</th>
+                  <th width="20%">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if (orders && orders.product && Array.isArray(orders.product) && orders.product.length > 0) { %>
+                  <% orders.product.forEach((product) => { %>
+                    <tr>
+                      <td class="text-center">
+                        <img src="<%= product.image || 'default.jpg' %>" style="height: 7rem; width: 7rem;" class="img-xs" alt="Item">
+                      </td>
+                      <td class="text-center"><%= product.name || product.title || 'N/A' %></td>
+                      <td class="text-center">₹<%= (product.price || 0).toLocaleString() %></td>
+                      <td class="text-center"><%= product.quantity || 0 %></td>
+                      <td class="text-center">₹<%= ((parseInt(product.price) || 0) * (parseInt(product.quantity) || 0)).toLocaleString() %></td>
+                      <td class="text-center">
+                        <% if (product.productStatus === "Cancelled") { %>
+                          <span class="badge bg-danger">Canceled</span>
+                        <% } else if (product.productStatus === "Returned" || product.productStatus === "Return Requested") { %>
+                          <% if (product.returnStatus === "Approved") { %>
+                            <span class="badge bg-success">Return Approved</span>
+                          <% } else if (product.returnStatus === "Rejected") { %>
+                            <span class="badge bg-warning">Return Rejected</span>
+                          <% } else { %>
+                            <span class="badge bg-primary">Return Requested</span>
+                          <% } %>
+                        <% } else { %>
+                          <% if (orders.status && orders.status.toLowerCase() === "delivered") { %>
+                            <button class="btn btn-warning btn-sm" onclick="toggleReturnForm('<%= product._id %>')">Return Order</button>
+                            <div id="returnForm_<%= product._id %>" class="return-form mt-2" style="display: none;">
+                              <form onsubmit="submitReturnOrder(event, '<%= orders._id %>', '<%= product._id %>')" method="POST">
+                                <input type="hidden" name="_method" value="PUT">
+                                <div class="mb-3">
+                                  <label for="returnReason_<%= product._id %>" class="form-label">Reason for Return</label>
+                                  <select class="form-control" id="returnReason_<%= product._id %>" required>
+                                    <option value="" disabled selected>Select a reason</option>
+                                    <option value="Defective product">Defective product</option>
+                                    <option value="Wrong item received">Wrong item received</option>
+                                    <option value="Not as described">Not as described</option>
+                                    <option value="Changed my mind">Changed my mind</option>
+                                    <option value="Other">Other</option>
+                                  </select>
+                                </div>
+                                <button type="submit" class="btn btn-warning btn-sm">Submit Return</button>
+                              </form>
+                            </div>
+                          <% } else if (orders.status === "Paid" || orders.status === "Confirmed" || orders.status === "Pending" || orders.status === "Shipped") { %>
+                            <button class="btn btn-danger btn-sm" onclick="toggleCancelForm('<%= product._id %>')">Cancel Order</button>
+                            <div id="cancelForm_<%= product._id %>" class="cancel-form mt-2" style="display: none;">
+                              <form onsubmit="submitCancelOrder(event, '<%= orders._id %>', '<%= product._id %>')" method="POST">
+                                <input type="hidden" name="_method" value="PUT">
+                                <div class="mb-3">
+                                  <label for="cancelReason_<%= product._id %>" class="form-label">Reason for Cancellation</label>
+                                  <select class="form-control" id="cancelReason_<%= product._id %>" required>
+                                    <option value="" disabled selected>Select a reason</option>
+                                    <option value="Changed my mind">Changed my mind</option>
+                                    <option value="Found a better price elsewhere">Found a better price elsewhere</option>
+                                    <option value="Item no longer needed">Item no longer needed</option>
+                                    <option value="Shipping delay">Shipping delay</option>
+                                    <option value="Other">Other</option>
+                                  </select>
+                                </div>
+                                <button type="submit" class="btn btn-danger btn-sm">Submit Cancellation</button>
+                              </form>
+                            </div>
+                          <% } %>
+                        <% } %>
+                      </td>
+                    </tr>
+                  <% }) %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="6">No products found</td>
+                  </tr>
+                <% } %>
+                <input type="hidden" name="" id="orderId" value="<%= orders._id %>">
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <% if (orders.status === "Delivered") { %>
+
+        
+        <div class="row mt-4">
+          <div class="col-lg">
+            <h5>Add Reviews</h5>
+            <% if (orders && orders.product && Array.isArray(orders.product) && orders.product.length > 0) { %>
+              <% orders.product.forEach((product, index) => { %>
+                <% const pId = product.productId ? (product.productId._id || product.productId) : null; %>
+                <% if (product.productStatus !== "Cancelled" && product.productStatus !== "Returned" && pId) { %>
+                  <div class="review-section mb-4" id="reviewSection_<%= product._id %>">
+                    <h6>Review for: <%= product.name || 'N/A' %></h6>
+                    <form class="reviewForm" data-product-id="<%= pId %>">
+                      <input type="hidden" name="productId" value="<%= pId %>">
+                      <div class="mb-3">
+                        <label for="rating_<%= product._id %>" class="form-label">Rating</label>
+                        <select class="form-control" id="rating_<%= product._id %>" name="rating" required>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                        </select>
+                      </div>
+                      <div class="mb-3">
+                        <label for="reviewText_<%= product._id %>" class="form-label">Review</label>
+                        <textarea class="form-control" id="reviewText_<%= product._id %>" name="reviewText" rows="3" required></textarea>
+                      </div>
+                      <button type="submit" class="btn btn-primary">Submit Review</button>
+                    </form>
+                  </div>
+                <% } %>
+              <% }); %>
+            <% } else { %>
+              <p>No products available to review.</p>
+            <% } %>
+          </div>
+        </div>
+      <% } %>
+  </section>
+</main>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="/furni-1.0.0/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/easyinvoice/dist/easyinvoice.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@10"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/elevatezoom/3.0.8/jquery.elevatezoom.min.js"></script>
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+  function toggleCancelForm(productId) {
+    const form = document.getElementById(`cancelForm_${productId}`);
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function toggleReturnForm(productId) {
+    const form = document.getElementById(`returnForm_${productId}`);
+    form.style.display = form.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function submitCancelOrder(event, orderId, productId) {
+    event.preventDefault();
+    const reason = document.getElementById(`cancelReason_${productId}`).value;
+
+    $.ajax({
+      url: '/cancelOrder',
+      method: 'PUT',
+      contentType: 'application/json',
+      data: JSON.stringify({ orderId: orderId, productId: productId, reason: reason }),
+      success: (response) => {
+        if (response.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Order Cancelled',
+            text: 'The order has been cancelled successfully!',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Cancellation Failed',
+            text: response.message || "Failed to cancel the order. Please try again.",
+            confirmButtonText: 'OK'
+          });
+        }
+      },
+      error: (error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: "An error occurred while cancelling the order. Please try again.",
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  }
+
+  function submitReturnOrder(event, orderId, productId) {
+    event.preventDefault();
+    const reason = document.getElementById(`returnReason_${productId}`).value;
+
+    $.ajax({
+      url: '/returnrequestOrder',
+      method: 'PUT',
+      contentType: 'application/json',
+      data: JSON.stringify({ orderId: orderId, productId: productId, reason: reason }),
+      success: (response) => {
+        if (response.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Return Initiated',
+            text: 'The return request has been initiated successfully!',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Return Failed',
+            text: response.message || "Failed to return the order. Please try again.",
+            confirmButtonText: 'OK'
+          });
+        }
+      },
+      error: (error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: "An error occurred while returning the order. Please try again.",
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  }
+
+  $(document).ready(function() {
+  $('.reviewForm').on('submit', function(event) {
+    event.preventDefault();
+    const form = $(this);
+    const productId = form.data('product-id');
+    const rating = form.find('select[name="rating"]').val();
+    const reviewText = form.find('textarea[name="reviewText"]').val();
+
+    console.log("Submitting review for productId:", productId); // Debug log
+
+    $.ajax({
+      url: '/addReview',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({ productId: productId, rating: rating, reviewText: reviewText }),
+      success: function(response) {
+        if (response.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Review Added',
+            text: 'Your review and rating have been added successfully!',
+            confirmButtonText: 'OK'
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Failed to Add Review',
+            text: response.message || "Failed to add the review. Please try again.",
+            confirmButtonText: 'OK'
+          });
+        }
+      },
+      error: (error) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: "An error occurred while adding the review. Please try again.",
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  });
+});
+
+  function retryPayment(orderId, amount) {
+    $.ajax({
+      url: '/create-razorpay-order',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        amount: amount
+      }),
+      success: function(response) {
+        if (response.success && response.order) {
+          var options = {
+            "key": "<%= process.env.RAZORPAY_KEY_ID || '' %>",
+            "amount": response.order.amount,
+            "currency": response.order.currency || "INR",
+            "name": "UrbenNest",
+            "description": "Retry Order Payment",
+            "order_id": response.order.id,
+            "handler": function (paymentResponse) {
+              completeRetryPayment(paymentResponse, orderId);
+            },
+            "theme": {
+              "color": "#3b5d50"
+            }
+          };
+          var rzp1 = new Razorpay(options);
+          rzp1.open();
+        } else {
+          Swal.fire({
+            title: "Error",
+            text: response.message || "Failed to generate payment order",
+            icon: "error"
+          });
+        }
+      },
+      error: (error) => {
+        Swal.fire({
+          title: "Error",
+          text: "An error occurred while creating payment order",
+          icon: "error"
+        });
+      }
+    });
+  }
+
+  function completeRetryPayment(paymentResponse, orderId) {
+    $.ajax({
+      url: '/complete-payment',
+      method: 'POST',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        orderId: orderId,
+        razorpayPaymentId: paymentResponse.razorpay_payment_id,
+        razorpayOrderId: paymentResponse.razorpay_order_id,
+        razorpaySignature: paymentResponse.razorpay_signature
+      }),
+      success: (response) => {
+        if (response.success) {
+          Swal.fire({
+            title: "Payment Successful",
+            text: "Payment completed successfully",
+            icon: "success",
+            confirmButtonText: "OK"
+          }).then(() => {
+            window.location.reload();
+          });
+        } else {
+          Swal.fire({
+            title: "Payment Failed",
+            text: response.message || "Payment verification failed",
+            icon: "error"
+          });
+        }
+      },
+      error: (xhr) => {
+        Swal.fire({
+          title: "Payment Error",
+          text: xhr.responseJSON?.message || "Payment verification failed",
+          icon: "error"
+        });
+      }
+    });
+  }
+</script>
+
+<%- include("../../views/partials/user/footer") %>
+</body>
+</html>

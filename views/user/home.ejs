@@ -1,0 +1,263 @@
+<%- include("../../views/partials/user/header", { currentPage: 'home' }) %>
+
+<!-- Start Hero Section -->
+<div class="hero">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-lg-5">
+                <div class="intro-excerpt">
+                    <h1>Modern Interior <span clsas="d-block">Design Studio</span></h1>
+                    <p class="mb-4">Enhance your home with sleek, modern furniture. Crafted for comfort, designed for elegance.</p>
+                    <p><a href="/shop" class="btn btn-secondary me-2">Shop Now</a><a href="/shop" class="btn btn-white-outline">Explore</a></p>
+                </div>
+            </div>
+            <div class="col-lg-7">
+                <div class="hero-img-wrap">
+                    <img src="/furni-1.0.0/images/couch.png" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Hero Section -->
+
+<!-- Start Product Section -->
+<div class="product-section">
+    <div class="container">
+        <div class="row">
+            <!-- Start Column 1 -->
+            <div class="col-md-12 col-lg-3 mb-5 mb-lg-0">
+                <h2 class="mb-4 section-title">Crafted with excellent material.</h2>
+                <p class="mb-4">Crafted for comfort and style.Perfectly designed to enhance your home with elegance and quality.</p>
+         r  <p><a href="/shop" class="btn">Explore</a></p>
+            </div>
+            <!-- End Column 1 -->
+
+            <!-- Start Column 2 -->
+            <% products.forEach(product => { %>
+                <div class="col-12 col-md-4 col-lg-3 mb-5 mb-md-0">
+                    <a class="product-item" href="/product-details?id=<%= product._id %>">
+                        <img src="<%= product.productImage[0] %>" style="border-radius: 30px;" class="img-fluid product-thumbnail">
+                        <div class="product-details">
+                            <h3 class="product-title"><%= product.productName %></h3>
+                            <div>
+                                <% if (product.regularPrice != product.salePrice) { %>
+                                    <strong style="text-decoration: line-through;" class="product-price">₹<%= product.regularPrice %></strong>
+                                    <strong style="color: green;" class="productsale-price">₹<%= product.salePrice %></strong>
+                                <% } else { %>
+                                    <strong class="product-price">₹<%= product.regularPrice %></strong>
+                                <% } %>
+                                
+                                
+                            </div>
+                            <span class="icon-cross">
+                                <img src="/furni-1.0.0/images/cross.svg" class="img-fluid">
+                            </span>
+                        </div>
+                    </a>
+                </div>
+                <% }) %>
+            <!-- End Column 2 -->
+        </div>
+    </div>
+</div>
+<!-- End Product Section -->
+
+<!-- Start Why Choose Us Section -->
+<div class="why-choose-section">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-lg-6">
+                <h2 class="section-title">Why Choose Us</h2>
+                <p>We offer premium-quality furniture with timeless designs. Crafted for durability, comfort, and elegance to elevate your space.</p>
+
+                <div class="row my-5">
+                    <div class="col-6 col-md-6">
+                        <div class="feature">
+                            <div class="icon">
+                                <img src="/furni-1.0.0/images/truck.svg" alt="Image" class="imf-fluid">
+                            </div>
+                            <h3>Fast & Free Shipping</h3>
+                            <p>Get your favorite furniture delivered quickly and at no extra cost. Hassle-free shipping for a seamless shopping experience.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-6">
+                        <div class="feature">
+                            <div class="icon">
+                                <img src="/furni-1.0.0/images/bag.svg" alt="Image" class="imf-fluid">
+                            </div>
+                            <h3>Easy to Shop</h3>
+                            <p>Enjoy effortless shopping with our simple platform. Browse products easily and complete your purchase securely and quickly.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-6">
+                        <div class="feature">
+                            <div class="icon">
+                                <img src="/furni-1.0.0/images/support.svg" alt="Image" class="imf-fluid">
+                            </div>
+                            <h3>24/7 Support</h3>
+                            <p>Our support team is available 24/7 to assist you with any questions or concerns, ensuring you get help whenever you need it.</p>
+                        </div>
+                    </div>
+
+                    <div class="col-6 col-md-6">
+                        <div class="feature">
+                            <div class="icon">
+                                <img src="/furni-1.0.0/images/return.svg" alt="Image" class="imf-fluid">
+                            </div>
+                            <h3>Hassle Free Returns</h3>
+                            <p>Shop confidently with our hassle-free returns. If you're not satisfied, return your item easily for a full refund or exchange.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-5"> designed to enhance your home with
+                <div class="img-wrap">
+                    <img src="/furni-1.0.0/images/why-choose-us-img.jpg" alt="Image" class="img-fluid">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Why Choose Us Section -->
+
+<!-- Start We Help Section -->
+<div class="we-help-section">
+    <div class="container">
+        <div class="row justify-content-between">
+            <div class="col-lg-7 mb-5 mb-lg-0">
+                <div class="imgs-grid">
+                    <div class="grid grid-1"><img src="/furni-1.0.0/images/img-grid-1.jpg" alt="Untree.co"></div>
+                    <div class="grid grid-2"><img src="/furni-1.0.0/images/img-grid-2.jpg" alt="Untree.co"></div>
+                    <div class="grid grid-3"><img src="/furni-1.0.0/images/img-grid-3.jpg" alt="Untree.co"></div>
+                </div>
+            </div>
+            <div class="col-lg-5 ps-lg-5">
+                <h2 class="section-title mb-4">We Help You Make Modern Interior Design</h2>
+                <p>Transform your space with our expert guidance in modern interior design. We focus on creating stylish and functional environments tailored to your unique taste and lifestyle.</p>
+
+                <ul class="list-unstyled custom-list my-4">
+                    <li>Personalized design consultations</li>
+                    <li>Space planning and optimization</li>
+                    <li>Access to the latest design trends</li>
+                    <li>Quality materials and finishes</li>
+                </ul>
+                <p><a href="/shop" class="btn">Explore</a></p>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End We Help Section -->
+
+<!-- Start Popular Product -->
+<div class="popular-product">
+    <div class="container">
+        <div class="row">
+            
+        </div>
+    </div>
+</div>
+<!-- End Popular Product -->
+
+
+<style>
+    
+    .product-item {
+        display: flex;
+        flex-direction: column;
+        height: 100%; 
+        text-align: center;
+        position: relative;
+    }
+
+    
+    .product-thumbnail {
+        height: 300px; 
+        width: 100%; 
+        object-fit: cover; 
+    }
+
+    
+    .product-details {
+        flex-grow: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        padding: 10px 0;
+    }
+
+    
+    .product-title {
+        margin: 10px 0;
+        min-height: 50px; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    
+    .product-price, .productsale-price {
+        display: inline-block;
+        margin: 0 5px;
+    }
+
+    
+    .icon-cross {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    
+
+    /* meadia query for make furniture image responsible */
+
+    .hero-img-wrap img.img-fluid {
+    max-width: 100%;
+    height: auto;
+    display: block; 
+}
+
+@media (max-width: 575.98px) {
+    .hero-img-wrap img.img-fluid {
+        width: 100%; 
+        height: auto; 
+        margin: 0 auto; 
+    }
+}
+
+
+@media (min-width: 576px) and (max-width: 767.98px) {
+    .hero-img-wrap img.img-fluid {
+        width: 90%; 
+        height: auto;
+        margin: 0 auto;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991.98px) {
+    .hero-img-wrap img.img-fluid {
+        width: 85%; 
+        height: auto;
+        margin: 0 auto;
+    }
+}
+
+@media (min-width: 992px) and (max-width: 1199.98px) {
+    .hero-img-wrap img.img-fluid {
+        width: 80%; 
+        height: auto;
+    }
+}
+
+@media (min-width: 1200px) {
+    .hero-img-wrap img.img-fluid {
+        width: 100%; 
+        height: auto;
+    }
+}
+</style>
+
+<%- include("../../views/partials/user/footer") %>
