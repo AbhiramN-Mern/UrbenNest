@@ -15,9 +15,14 @@ const Cart = require("../../models/cartSchema");
 const razorpay = require("../../config/razorpay");
 const crypto = require('crypto'); // Added import
 
+const getUserIdFromSession = (session) => {
+  if (!session || !session.user) return null;
+  return (typeof session.user === 'object' && session.user._id) ? session.user._id : session.user;
+};
+
 const getCheckoutPage = async (req, res, next) => {
   try {
-    const userId = req.session.user;
+    const userId = getUserIdFromSession(req.session);
 
     if (!userId) {
       return res.redirect("/login");
@@ -31,22 +36,35 @@ const getCheckoutPage = async (req, res, next) => {
     const cart = await Cart.findOne({ userId: userId }).populate("items.productId");
 
     if (cart && cart.items.length > 0) {
+      // Filter out items whose product was deleted or is null
+      const validItems = cart.items.filter(item => item.productId != null);
+
+      // Clean up orphaned deleted products from the cart in database if any found
+      if (validItems.length !== cart.items.length) {
+        cart.items = validItems;
+        await cart.save();
+      }
+
+      if (validItems.length === 0) {
+        return res.redirect("/shop");
+      }
+
       const addressData = await Address.findOne({ userId: userId });
-      const data = cart.items.map((item) => ({
+      const data = validItems.map((item) => ({
         proId: item.productId._id,
         quantity: item.quantity,
         productDetails: [item.productId],
       }));
 
-      const grandTotal = cart.items.reduce((total, item) => {
-        return total + item.quantity * item.productId.salePrice;
+      const grandTotal = validItems.reduce((total, item) => {
+        return total + item.quantity * (item.productId.salePrice || 0);
       }, 0);
 
       const deliveryCharge = grandTotal < 10000 ? 200 : 0;
       const totalWithDelivery = grandTotal + deliveryCharge;
 
       const wallet = await Wallet.findOne({ user: userId });
-      const walletBalance = wallet ?Math.round( wallet.balance) : 0
+      const walletBalance = wallet ? Math.round(wallet.balance) : 0;
 
       res.render("checkoutcart", {
         product: data,
@@ -64,6 +82,7 @@ const getCheckoutPage = async (req, res, next) => {
       res.redirect("/shop");
     }
   } catch (error) {
+    console.error("Error in getCheckoutPage:", error);
     next(error);
   }
 };
@@ -71,7 +90,7 @@ const getCheckoutPage = async (req, res, next) => {
 const deleteProduct = async (req, res, next) => {
   try {
     const productId = req.query.id;
-    const userId = req.session.user;
+    const userId = getUserIdFromSession(req.session);
 
     if (!productId || !userId) {
       return res.redirect("/pageNotFound");
@@ -83,7 +102,7 @@ const deleteProduct = async (req, res, next) => {
       return res.redirect("/checkout");
     }
 
-    const itemIndex = cart.items.findIndex((item) => item.productId.toString() === productId);
+    const itemIndex = cart.items.findIndex((item) => item.productId && item.productId.toString() === productId);
 
     if (itemIndex === -1) {
       return res.redirect("/checkout");
@@ -93,12 +112,13 @@ const deleteProduct = async (req, res, next) => {
     await cart.save();
     res.redirect("/checkout");
   } catch (error) {
+    console.error("Error in deleteProduct:", error);
     next(error);
   }
 };
 const applyCoupon = async (req, res, next) => {
   try {
-    const userId = req.session.user;
+    const userId = getUserIdFromSession(req.session);
     const selectedCoupon = await Coupon.findOne({ name: req.body.coupon });
     if (!selectedCoupon) {
       return res.json({ success: false, message: 'Coupon not found' });
@@ -118,6 +138,7 @@ const applyCoupon = async (req, res, next) => {
       offerPrice: parseInt(selectedCoupon.offerPrice)
     });
   } catch (error) {
+    console.error("Error in applyCoupon:", error);
     next(error);
   }
 };
@@ -125,7 +146,7 @@ const applyCoupon = async (req, res, next) => {
 const orderPlaced = async (req, res, next) => {
   try {
     const { totalPrice, discount, deliveryCharge, addressId, payment } = req.body;
-    const userId = req.session.user;
+    const userId = getUserIdFromSession(req.session);
 
     // Convert to numbers safely and provide defaults
     const totalPriceValue = totalPrice ? parseInt(totalPrice) : 0;
@@ -159,12 +180,17 @@ const orderPlaced = async (req, res, next) => {
       return res.status(404).json({ error: "Cart is empty" });
     }
 
-    const orderedProducts = cart.items.map((item) => ({
+    const validItems = cart.items.filter((item) => item.productId != null);
+    if (validItems.length === 0) {
+      return res.status(400).json({ error: "Cart is empty or items are no longer available" });
+    }
+
+    const orderedProducts = validItems.map((item) => ({
       productId: item.productId._id,
       quantity: item.quantity,
       price: item.productId.salePrice,
       name: item.productId.productName,
-      image: item.productId.productImage[0],
+      image: item.productId.productImage?.[0] || '',
       productStatus: "Confirmed",
       user: userId
     }));
@@ -372,7 +398,7 @@ const completePayment = async (req, res, next) => {
 
 const getOrderDetailsPage = async (req, res, next) => {
   try {
-    const userId = new mongoose.Types.ObjectId(req.session.user);
+    const userId = getUserIdFromSession(req.session);
     const orderId = req.query.id || req.params.id || req.body.id;
 
     const findOrder = await Order.findOne({ 
@@ -443,7 +469,7 @@ const changeSingleProductStatus = async (req, res, next) => {
 
 const cancelOrder = async (req, res, next) => {
   try {
-    const userId = req.session.user;
+    const userId = getUserIdFromSession(req.session);
     const { orderId, productId } = req.body;
 
     const findOrder = await Order.findOne({ _id: orderId });
@@ -528,7 +554,7 @@ const cancelOrder = async (req, res, next) => {
 
 const returnorder = async (req, res, next) => {
   try {
-    const userId = req.session.user;
+    const userId = getUserIdFromSession(req.session);
     const { orderId, productId, reason } = req.body;
 
     const findOrder = await Order.findOne({ _id: orderId });
@@ -691,17 +717,16 @@ const getAvailableCoupons = async (req, res, next) => {
 const removeCoupon = async (req, res) => {
   try {
     const { total } = req.body;
-    const userId = req.session.user;
-
+    const userId = getUserIdFromSession(req.session);
 
     const cart = await Cart.findOne({ userId }).populate("items.productId");
     if (!cart) {
       throw new Error("Cart not found");
     }
 
-    
-    const actualTotal = cart.items.reduce((sum, item) => {
-      return sum + (item.quantity * item.productId.salePrice);
+    const validItems = cart.items.filter((item) => item.productId != null);
+    const actualTotal = validItems.reduce((sum, item) => {
+      return sum + (item.quantity * (item.productId.salePrice || 0));
     }, 0);
 
   

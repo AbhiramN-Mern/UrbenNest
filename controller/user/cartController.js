@@ -36,6 +36,12 @@ const getCartPage = async (req, res) => {
         // Filter out items whose product was deleted from DB
         const validItems = cart.items.filter(item => item.productId != null);
 
+        // Clean up orphaned deleted products from DB
+        if (validItems.length !== cart.items.length) {
+            cart.items = validItems;
+            await cart.save();
+        }
+
         // Check for blocked products
         const blockedProducts = validItems.filter(item => 
             item.productId.isBlocked === true

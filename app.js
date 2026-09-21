@@ -86,6 +86,7 @@ app.use((req, res, next) => {
 
 // Global Error Handler 
 app.use((err, req, res, next) => {
+    console.error("Unhandled Server Error:", err);
     if (err.name === 'CastError') {
         return res.status(400).render('page-404', { 
             errorMessage: 'Invalid ID provided' 

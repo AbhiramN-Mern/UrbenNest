@@ -29,7 +29,7 @@
                     <% for (let i = 0; i < product.length; i++) { %>
                       <tr>
                         <td class="product-thumbnail" style="width: 100px;">
-                          <img src="<%= product[i].productDetails[0].productImage[0] %>" alt="#" class="img-fluid rounded">
+                          <img src="<%= (product[i].productDetails[0].productImage && product[i].productDetails[0].productImage[0]) || '/images/default.jpg' %>" alt="#" class="img-fluid rounded">
                         </td>
                         <td>
                           <h6 class="mb-0">
@@ -92,7 +92,7 @@
           </div>
           <div class="card-body">
             <div class="row">
-              <% if (locals.userAddress && userAddress.address.length > 0) { %>
+              <% if (locals.userAddress && userAddress.address && userAddress.address.length > 0) { %>
                 <% userAddress.address.forEach((address) => { %>
                   <div class="col-md-6 mb-3">
                     <div class="card h-100 address-card position-relative border <%= address.addressType === 'Home' ? 'border-primary' : '' %>">
